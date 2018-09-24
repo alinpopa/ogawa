@@ -1,0 +1,14 @@
+.PHONY: build run test
+
+all: build
+
+VSN := $(shell git describe --always --dirty)
+
+build:
+	docker build -t ogawa:$(VSN) .
+
+run:
+	docker run -it --rm ogawa:$(VSN)
+
+test:
+	docker build -t ogawa-test:$(VSN) -f Dockerfile.test .

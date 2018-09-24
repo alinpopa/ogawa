@@ -1,0 +1,6 @@
+FROM alpine
+
+COPY data.json /data.json
+COPY produce.sh /produce.sh
+
+CMD ["sh", "produce.sh"]

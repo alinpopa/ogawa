@@ -1,0 +1,14 @@
+FROM elixir:1.7
+
+COPY apps apps
+COPY Makefile Makefile
+COPY mix.exs mix.exs
+COPY mix.lock mix.lock
+COPY config config
+
+RUN rm -Rf _build && \
+  mix local.hex --force && \
+  mix local.rebar --force && \
+  make build
+
+CMD ["mix", "run", "-e", "OgawaStream.make() |> OgawaStream.from(OgawaStream.Device.Socket.create('producer', 5555)) |> OgawaStream.take(10) |> OgawaStream.add_pair(\"one\", \"two\") |> OgawaStream.to(%OgawaStream.Device.Stdout{}) |> OgawaStream.sync()"]

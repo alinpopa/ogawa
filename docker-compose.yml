@@ -1,0 +1,13 @@
+version: '3'
+services:
+  producer:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.producer
+    ports:
+      - "5555:5555"
+
+  consumer:
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile.consumer
