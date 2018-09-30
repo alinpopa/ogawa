@@ -21,7 +21,7 @@ By default, Ogawa will handle JSON using the decoder/encoder implementations.
 Ogawa can be extended using various extension points:
 
 - custom decoders/encoders - using `OgawaStream.decode_with/2`, and `OgawaStream.encode_with/2` combinators.
-- custom reader/writer - using `OgawaStream.Reader.Proto`, and `OgawaStream.Writer.Proto` protocols.
+- custom reader/writer - using `OgawaStream.Proto.Reader`, and `OgawaStream.Proto.Writer` protocols.
 - as well, implementations are needed for `OgawaStream.Proto.From`, and `OgawaStream.Proto.To` in order to be able to accept custom readers/writers (`apps/ogawa_stream/lib/proto/from/` and `ogawa_stream/lib/proto/to/` can be used in order to see how these are being implemented).
 
 As for throttling, in order to support a simple strategy like time based throttling (i.e. set the frequency of stream elements produced),
@@ -80,7 +80,7 @@ Out of the box, the following Readers and Writers are supported:
 - `Socket` (both)
 - `List` (both)
 
-If, for instance, a HTTP Reader is needed, this can be done by implementing the `OgawaStream.Reader.Proto` protocol for a particular struct (let's say you'll have a struct `Extension.Device.Http`; then you can just pass an `Http` struct to the `from/3` combinator). As an example on how these are implemented, you can check the `apps/ogawa_stream/lib/reader/proto/` folder. For the writers, these can be found within `apps/ogawa_stream/lib/writer/proto/`.
+If, for instance, a HTTP Reader is needed, this can be done by implementing the `OgawaStream.Proto.Reader` protocol for a particular struct (let's say you'll have a struct `Extension.Device.Http`; then you can just pass an `Http` struct to the `from/3` combinator). As an example on how these are implemented, you can check the `apps/ogawa_stream/lib/reader/proto/` folder. For the writers, these can be found within `apps/ogawa_stream/lib/writer/proto/`.
 
 Some of the readers/writers are not that straight forward to be created, therefore they may have a `create` function.
 

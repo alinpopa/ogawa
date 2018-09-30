@@ -2,7 +2,7 @@ defmodule OgawaStream.Writer.SocketTest do
   use ExUnit.Case
   doctest OgawaStream
   alias OgawaStream, as: Ogawa
-  alias Ogawa.Writer.Proto, as: ProtoWriter
+  alias Ogawa.Proto.Writer
 
   defp start_server() do
     {:ok, pid} = Ogawa.TcpServer.start()
@@ -14,13 +14,12 @@ defmodule OgawaStream.Writer.SocketTest do
     GenServer.stop(server.pid)
   end
 
-  describe "OgawaStream.Writer.Proto.Writer.create/1" do
+  describe "Writer.create/1" do
     test "should successfully create a socket writer" do
       server = start_server()
       on_exit(fn -> stop_server(server) end)
 
-      {:ok, writer} =
-        ProtoWriter.create(%Ogawa.Device.Socket{host: '127.0.0.1', port: server.port})
+      {:ok, writer} = Writer.create(%Ogawa.Device.Socket{host: '127.0.0.1', port: server.port})
 
       assert not is_nil(writer.pid)
     end
@@ -30,29 +29,27 @@ defmodule OgawaStream.Writer.SocketTest do
       stop_server(server)
 
       assert {:error, {:socket_connection, {'127.0.0.1', _}, _}} =
-               ProtoWriter.create(%Ogawa.Device.Socket{host: '127.0.0.1', port: server.port})
+               Writer.create(%Ogawa.Device.Socket{host: '127.0.0.1', port: server.port})
     end
   end
 
-  describe "OgawaStream.Writer.Proto.Writer.write/2" do
+  describe "Writer.write/2" do
     test "should successfully write an empty stream" do
       server = start_server()
       on_exit(fn -> stop_server(server) end)
 
-      {:ok, writer} =
-        ProtoWriter.create(%Ogawa.Device.Socket{host: '127.0.0.1', port: server.port})
+      {:ok, writer} = Writer.create(%Ogawa.Device.Socket{host: '127.0.0.1', port: server.port})
 
-      assert :ok = ProtoWriter.write(writer, [])
+      assert :ok = Writer.write(writer, [])
     end
 
     test "should successfully write non-empty stream" do
       server = start_server()
       on_exit(fn -> stop_server(server) end)
 
-      {:ok, writer} =
-        ProtoWriter.create(%Ogawa.Device.Socket{host: '127.0.0.1', port: server.port})
+      {:ok, writer} = Writer.create(%Ogawa.Device.Socket{host: '127.0.0.1', port: server.port})
 
-      assert :ok = ProtoWriter.write(writer, ["one", "two"])
+      assert :ok = Writer.write(writer, ["one", "two"])
     end
   end
 end

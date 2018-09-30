@@ -1,31 +1,33 @@
-defmodule OgawaStream.Device do
-  defmodule File do
-    defstruct file: nil,
-              device: nil
+defimpl OgawaStream.Proto.From, for: Any do
+  def from(_reader), do: nil
+end
 
-    def create(file) do
-      %OgawaStream.Device.File{
-        file: file,
-        device: nil
-      }
-    end
-  end
+defimpl OgawaStream.Proto.To, for: Any do
+  def to(_writer), do: nil
+end
 
-  defmodule Socket do
-    defstruct host: nil,
-              port: nil,
-              pid: nil
+defimpl OgawaStream.Proto.From, for: List do
+  def from(reader), do: reader
+end
 
-    def create(host, port) do
-      %OgawaStream.Device.Socket{host: host, port: port}
-    end
-  end
+defimpl OgawaStream.Proto.To, for: List do
+  def to(writer), do: writer
+end
 
-  defmodule Stdin do
-    defstruct device: :stdio
-  end
+defimpl OgawaStream.Proto.Reader, for: List do
+  def create(list), do: {:ok, list}
 
-  defmodule Stdout do
-    defstruct device: :stdio
-  end
+  def read_line([h | t]), do: {h, t}
+
+  def read_line([]), do: {:done, []}
+
+  def close(_list), do: :ok
+end
+
+defimpl OgawaStream.Proto.Writer, for: List do
+  def create(writer), do: {:ok, writer}
+
+  def write(writer, stream), do: stream |> Enum.into(writer)
+
+  def close(_writer), do: :ok
 end

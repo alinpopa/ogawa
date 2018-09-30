@@ -11,20 +11,20 @@ defmodule OgawaStream do
             mappers: []
 
   alias OgawaStream, as: Ogawa
-  alias Ogawa.Proto.From, as: ProtoFrom
-  alias Ogawa.Proto.To, as: ProtoTo
-  alias Ogawa.Reader.Proto, as: ProtoReader
-  alias Ogawa.Writer.Proto, as: ProtoWriter
+  alias Ogawa.Proto.From
+  alias Ogawa.Proto.To
+  alias Ogawa.Proto.Reader
+  alias Ogawa.Proto.Writer
 
   def make(), do: %Ogawa{}
 
   def from(ogawa, reader, max_results \\ 100) do
-    reader = ProtoFrom.from(reader)
+    reader = From.from(reader)
     %Ogawa{ogawa | reader: reader, max_results: max_results}
   end
 
   def to(ogawa, writer) do
-    writer = ProtoTo.to(writer)
+    writer = To.to(writer)
     %Ogawa{ogawa | writer: writer}
   end
 
@@ -86,9 +86,9 @@ defmodule OgawaStream do
     ogawa = %Ogawa{ogawa | started: true}
 
     with {:ok, ogawa} <- vet(ogawa),
-         {:ok, reader} <- ProtoReader.create(ogawa.reader),
-         {:ok, writer} <- ProtoWriter.create(ogawa.writer) do
-      Ogawa.Reader.Process.async(reader, ogawa.freq, fn stream ->
+         {:ok, reader} <- Reader.create(ogawa.reader),
+         {:ok, writer} <- Writer.create(ogawa.writer) do
+      Ogawa.StreamReader.async(reader, ogawa.freq, fn stream ->
         stream
         |> apply_decoder(ogawa)
         |> apply_mappers(ogawa)
@@ -131,7 +131,7 @@ defmodule OgawaStream do
   end
 
   defp write(stream, writer) do
-    ProtoWriter.write(writer, stream)
+    Writer.write(writer, stream)
   end
 
   defp vet(%Ogawa{reader: nil}),

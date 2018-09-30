@@ -2,7 +2,7 @@ defmodule OgawaStream.Writer.FileTest do
   use ExUnit.Case
   doctest OgawaStream
   alias OgawaStream, as: Ogawa
-  alias Ogawa.Writer.Proto, as: ProtoWriter
+  alias Ogawa.Proto.Writer
 
   @test_file "some_file_used_for_testing.txt"
 
@@ -10,24 +10,24 @@ defmodule OgawaStream.Writer.FileTest do
     File.rm(Path.join(:code.priv_dir(:ogawa_stream), @test_file))
   end
 
-  describe "OgawaStream.Writer.Proto.Writer.create/1" do
+  describe "Writer.create/1" do
     test "should successfully create a file stream on disk" do
       on_exit(fn -> remove_test_file() end)
       file = Path.join(:code.priv_dir(:ogawa_stream), @test_file)
-      {:ok, writer} = ProtoWriter.create(Ogawa.Device.File.create(file))
+      {:ok, writer} = Writer.create(Ogawa.Device.File.create(file))
 
       assert writer.file == file
     end
   end
 
-  describe "OgawaStream.Writer.Proto.Writer.write/2" do
+  describe "Writer.write/2" do
     test "should successfully write empty stream to file" do
       on_exit(fn -> remove_test_file() end)
       file = Path.join(:code.priv_dir(:ogawa_stream), @test_file)
 
-      {:ok, writer} = ProtoWriter.create(Ogawa.Device.File.create(file))
+      {:ok, writer} = Writer.create(Ogawa.Device.File.create(file))
 
-      :ok = ProtoWriter.write(writer, [])
+      :ok = Writer.write(writer, [])
 
       content =
         File.stream!(file)
@@ -40,9 +40,9 @@ defmodule OgawaStream.Writer.FileTest do
       on_exit(fn -> remove_test_file() end)
       file = Path.join(:code.priv_dir(:ogawa_stream), @test_file)
 
-      {:ok, writer} = ProtoWriter.create(Ogawa.Device.File.create(file))
+      {:ok, writer} = Writer.create(Ogawa.Device.File.create(file))
 
-      :ok = ProtoWriter.write(writer, ["test1", "test2"])
+      :ok = Writer.write(writer, ["test1", "test2"])
 
       content =
         File.stream!(file)

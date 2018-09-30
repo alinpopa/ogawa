@@ -2,7 +2,7 @@ defmodule OgawaStream.Writer.StdoutTest do
   use ExUnit.Case
   doctest OgawaStream
   alias OgawaStream, as: Ogawa
-  alias Ogawa.Writer.Proto, as: ProtoWriter
+  alias Ogawa.Proto.Writer
 
   defmodule TestStdout do
     use GenServer
@@ -36,23 +36,23 @@ defmodule OgawaStream.Writer.StdoutTest do
     GenServer.stop(server.pid)
   end
 
-  describe "OgawaStream.Writer.Proto.Writer.create/1" do
+  describe "Writer.create/1" do
     test "should successfully create a stdout writer" do
       server = start_server()
       on_exit(fn -> stop_server(server) end)
 
-      {:ok, writer} = ProtoWriter.create(%Ogawa.Device.Stdout{device: server.pid})
+      {:ok, writer} = Writer.create(%Ogawa.Device.Stdout{device: server.pid})
       assert writer.device == server.pid
     end
   end
 
-  describe "OgawaStream.Writer.Proto.Writer.write/2" do
+  describe "Writer.write/2" do
     test "should successfully write an empty stream" do
       server = start_server()
       on_exit(fn -> stop_server(server) end)
 
-      {:ok, writer} = ProtoWriter.create(%Ogawa.Device.Stdout{device: server.pid})
-      :ok = ProtoWriter.write(writer, [])
+      {:ok, writer} = Writer.create(%Ogawa.Device.Stdout{device: server.pid})
+      :ok = Writer.write(writer, [])
       assert GenServer.call(server.pid, :get_lines) == []
     end
 
@@ -60,8 +60,8 @@ defmodule OgawaStream.Writer.StdoutTest do
       server = start_server()
       on_exit(fn -> stop_server(server) end)
 
-      {:ok, writer} = ProtoWriter.create(%Ogawa.Device.Stdout{device: server.pid})
-      :ok = ProtoWriter.write(writer, ["line1", "line2"])
+      {:ok, writer} = Writer.create(%Ogawa.Device.Stdout{device: server.pid})
+      :ok = Writer.write(writer, ["line1", "line2"])
       assert GenServer.call(server.pid, :get_lines) == ["line1\n", "line2\n"]
     end
   end

@@ -2,7 +2,7 @@ defmodule OgawaStream.Reader.FileTest do
   use ExUnit.Case
   doctest OgawaStream
   alias OgawaStream, as: Ogawa
-  alias Ogawa.Reader.Proto, as: ProtoReader
+  alias Ogawa.Proto.Reader
 
   @test_file "some_file_used_for_testing.txt"
 
@@ -19,12 +19,12 @@ defmodule OgawaStream.Reader.FileTest do
     :ok
   end
 
-  describe "OgawaStream.Reader.Proto.Reader.create/1" do
+  describe "Reader.create/1" do
     test "should fail gracefully when file doesn't exist" do
       on_exit(fn -> remove_test_file() end)
 
       file = Path.join(:code.priv_dir(:ogawa_stream), "no_file.here")
-      reader = ProtoReader.create(Ogawa.Device.File.create(file))
+      reader = Reader.create(Ogawa.Device.File.create(file))
       assert reader == {:error, {:opening_file, file, :enoent}}
     end
 
@@ -32,13 +32,13 @@ defmodule OgawaStream.Reader.FileTest do
       on_exit(fn -> remove_test_file() end)
 
       file = Path.join(:code.priv_dir(:ogawa_stream), @test_file)
-      reader = ProtoReader.create(Ogawa.Device.File.create(file))
+      reader = Reader.create(Ogawa.Device.File.create(file))
       {:ok, %Ogawa.Device.File{device: pid}} = reader
       assert is_pid(pid)
     end
   end
 
-  describe "OgawaStream.Reader.Proto.Reader.read_line/1" do
+  describe "Reader.read_line/1" do
     test "should not return anything when reading an empty file" do
       file_name = "test_one_line.txt"
 
@@ -50,9 +50,9 @@ defmodule OgawaStream.Reader.FileTest do
       File.write(Path.join(:code.priv_dir(:ogawa_stream), file_name), "")
 
       file = Path.join(:code.priv_dir(:ogawa_stream), file_name)
-      {:ok, device} = ProtoReader.create(Ogawa.Device.File.create(file))
+      {:ok, device} = Reader.create(Ogawa.Device.File.create(file))
 
-      line = ProtoReader.read_line(device)
+      line = Reader.read_line(device)
       assert line == {:done, device}
     end
 
@@ -60,10 +60,10 @@ defmodule OgawaStream.Reader.FileTest do
       on_exit(fn -> remove_test_file() end)
 
       file = Path.join(:code.priv_dir(:ogawa_stream), @test_file)
-      {:ok, device} = ProtoReader.create(Ogawa.Device.File.create(file))
+      {:ok, device} = Reader.create(Ogawa.Device.File.create(file))
 
-      assert ProtoReader.read_line(device) == {"This is a test", device}
-      assert ProtoReader.read_line(device) == {:done, device}
+      assert Reader.read_line(device) == {"This is a test", device}
+      assert Reader.read_line(device) == {:done, device}
     end
   end
 end

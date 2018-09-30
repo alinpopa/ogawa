@@ -1,7 +1,7 @@
-defmodule OgawaStream.Reader.Process do
+defmodule OgawaStream.StreamReader do
   use GenServer
   alias OgawaStream, as: Ogawa
-  alias Ogawa.Reader.Proto, as: ProtoReader
+  alias Ogawa.Proto.Reader, as: Reader
 
   defmodule State do
     defstruct device: nil,
@@ -53,7 +53,7 @@ defmodule OgawaStream.Reader.Process do
 
   def handle_info(:get_line, state) do
     {msg, state} =
-      case ProtoReader.read_line(state.device) do
+      case Reader.read_line(state.device) do
         {:done, device} ->
           {:done, %State{state | device: device}}
 
@@ -69,5 +69,5 @@ defmodule OgawaStream.Reader.Process do
   end
 
   def terminate(_reason, state),
-    do: ProtoReader.close(state.device)
+    do: Reader.close(state.device)
 end
